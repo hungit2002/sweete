@@ -1,20 +1,20 @@
 version: "3.7"
 services:
-  app:
+  sweete:
     build:
       args:
-        user: sammy
+        user: hung
         uid: 1000
       context: ./
       dockerfile: Dockerfile
-    image: sweete
-    container_name: sweete-app
+    image: sweete-img
+    container_name: sweete-container
     restart: unless-stopped
     working_dir: /var/www/
     volumes:
-      - ./:/var/www
+      - ./:/var/www/
     networks:
-      - sweete
+      - sweete-network
   db:
     image: mysql:8.0
     container_name: sweete-db
@@ -29,18 +29,7 @@ services:
     volumes:
       - ./docker-compose/mysql:/docker-entrypoint-initdb.d
     networks:
-      - sweete
-  nginx:
-    image: nginx:1.17-alpine
-    container_name: sweete-nginx
-    restart: unless-stopped
-    ports:
-      - 8000:80
-    volumes:
-      - ./:/var/www
-      - ./docker-compose/nginx:/etc/nginx/conf.d
-    networks:
-      - sweete
+      - sweete-network
 networks:
-  sweete:
+  sweete-network:
     driver: bridge
