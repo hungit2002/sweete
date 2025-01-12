@@ -37,3 +37,4 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('get-user-info', [UserController::class, 'getUserInfo']);
     });
 });
+// jenkins init
