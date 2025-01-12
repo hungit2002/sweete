@@ -30,6 +30,17 @@ services:
       - ./docker-compose/mysql:/docker-entrypoint-initdb.d
     networks:
       - sweete-network
+  nginx:
+    image: nginx:alpine
+    container_name: sweete-nginx
+    restart: unless-stopped
+    ports:
+      - 80:80
+    volumes:
+      - ./:/var/www
+      - ./docker-compose/nginx:/etc/nginx/conf.d/
+    networks:
+      - sweete-network
 networks:
   sweete-network:
     driver: bridge
