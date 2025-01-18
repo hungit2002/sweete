@@ -4,9 +4,6 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-      args:
-        user: hung
-        uid: 1000
     image: sweete-img
     container_name: sweete-container
     restart: unless-stopped
