@@ -13,7 +13,7 @@ pipeline {
                 script {
                     def envFile = 'env-sweete-live'
                     // Sao chép file .env từ Jenkins server đến thư mục làm việc
-                    sh "cp /var/jenkins_home/envs/${envFile} .env"
+                    sh "cp /var/lib/jenkins/envs/${envFile} .env"
                 }
             }
         }
