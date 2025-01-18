@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('tags', function (Blueprint $table) {
-            $table->foreign('user_id')->references('id')->on('users');
             $table->unsignedBigInteger('post_id');
             $table->unsignedBigInteger('user_id');
             $table->foreign('post_id')->references('id')->on('posts');
+	    $table->foreign('user_id')->references('id')->on('users');
             $table->primary(['post_id','user_id']);
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
