@@ -1,43 +1,19 @@
 pipeline {
     agent any
-    environment {
-        APP_ENV = "production"
-        DEPLOY_SERVER = "root@45.77.250.80"
-        DEPLOY_PATH = "/var/www"
-    }
     stages {
-        stage('Clone') {
+        stage('Clone stage') {
             steps {
                 git 'https://github.com/hungit2002/sweete.git'
             }
         }
-        stage('Deploy to Server') {
+        stage('Build stage') {
             steps {
-                sshagent(['ssh-sweete-deploy-key']) {
-                    sh """
-                        rsync -avz --exclude=".git" --exclude="node_modules" \
-                        --exclude="storage" --exclude=".env" ./ ${DEPLOY_SERVER}:${DEPLOY_PATH}
-                        ssh ${DEPLOY_SERVER} "
-                            cd ${DEPLOY_PATH} &&
-                            composer install --no-dev --optimize-autoloader &&
-                            php artisan migrate --force &&
-                            php artisan cache:clear &&
-                            php artisan config:cache
-                        "
-                    """
+                // This step should not normally be used in your script. Consult the inline help for details.
+                withDockerRegistry(credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/') {
+                    sh 'docker build -t hungit2002/laravel-sweete .'
+                    sh 'docker push hungit2002/laravel-sweete'
                 }
             }
         }
     }
-     post {
-            success {
-                echo 'Deployment successful!'
-            }
-            failure {
-                echo 'Deployment failed.'
-            }
-            always {
-                cleanWs()
-            }
-        }
 }
