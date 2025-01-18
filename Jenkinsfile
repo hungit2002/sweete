@@ -7,6 +7,16 @@ pipeline {
                 git 'https://github.com/hungit2002/sweete.git'
             }
         }
+        stage('Prepare env') {
+            agent { label 'jenkin-node' }
+            steps {
+                script {
+                    def envFile = 'env-sweete-live'
+                    // Sao chép file .env từ Jenkins server đến thư mục làm việc
+                    sh "cp /var/jenkins_home/envs/${envFile} .env"
+                }
+            }
+        }
         stage('Build Image') {
             agent { label 'jenkin-node' }
             steps {
@@ -26,12 +36,12 @@ pipeline {
             }
         }
         stage('Deploy image') {
-                    agent { label 'sweete_server' }
-                    steps {
-                       sshagent(['ssh-remote']) {
-                           sh 'ssh -o StrictHostKeyChecking=no -l root 45.77.250.80 docker pull hungit2002/laravel-sweete && docker-compose up -d'
-                       }
-                    }
-                }
+            agent { label 'sweete_server' }
+            steps {
+               sshagent(['ssh-remote']) {
+                   sh 'ssh -o StrictHostKeyChecking=no -l root 45.77.250.80 docker pull hungit2002/laravel-sweete && docker-compose up -d'
+               }
+            }
+        }
     }
 }
