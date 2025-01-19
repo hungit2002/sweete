@@ -7,17 +7,6 @@ pipeline {
                 git 'https://github.com/hungit2002/sweete.git'
             }
         }
-        stage('Prepare env') {
-            agent { label 'jenkin-node' }
-            steps {
-                script {
-                   def containerName = "jenkins-blueocean"
-                   def sourceFile = "/var/envs/sweete-env-live"
-                   def destPath = "/var/jenkins_home/workspace/sweete_2"
-                   sh "docker cp ${sourceFile} ${containerName}:${destPath}"
-                }
-            }
-        }
         stage('Build Image') {
             agent { label 'jenkin-node' }
             steps {
