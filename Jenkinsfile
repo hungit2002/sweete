@@ -11,9 +11,10 @@ pipeline {
             agent { label 'jenkin-node' }
             steps {
                 script {
-                    def envFile = 'env-sweete-live'
-                    // Sao chép file .env từ Jenkins server đến thư mục làm việc
-                    sh "ls -l /var/lib/jenkins/envs/${envFile}"
+                   def containerName = "jenkins-blueocean"
+                   def sourceFile = "/var/envs/sweete-env-live"
+                   def destPath = "/var/jenkins_home/workspace/sweete_2"
+                   sh "docker cp ${sourceFile} ${containerName}:${destPath}"
                 }
             }
         }
