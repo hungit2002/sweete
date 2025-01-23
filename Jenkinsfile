@@ -10,7 +10,7 @@ pipeline {
             steps {
                 // This step should not normally be used in your script. Consult the inline help for details.
                 withDockerRegistry(credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/') {
-                    sh 'cd sweete && docker build -t hungit2002/laravel-sweete .'
+                    sh 'docker build -t hungit2002/laravel-sweete .'
                 }
             }
         }
@@ -32,17 +32,12 @@ pipeline {
                     version: '3.7'
                     services:
                       sweete:
-                        build:
-                          context: ./
-                          dockerfile: Dockerfile
                         image: sweete-img
                         container_name: sweete-container
                         restart: unless-stopped
                         working_dir: /var/www/
                         ports:
                           - '8000:9000'
-                        volumes:
-                          - ./:/var/www/
                         networks:
                           - app-network
                     networks:
