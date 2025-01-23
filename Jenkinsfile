@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'docker-agent' }  // Chỉ định node agent có tên là 'docker-agent', có thể là bất kỳ agent nào của bạn
+    agent { label 'laravel-agent' }  // Chỉ định node agent có tên là 'docker-agent', có thể là bất kỳ agent nào của bạn
 
     environment {
         // Đặt biến môi trường cho Docker image name, version, v.v.
@@ -31,8 +31,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-hub', url: 'https://index.docker.io/v1/') {
-                        sh 'docker build -t hungit2002/laravel-sweete .'
-                        sh 'docker push hungit2002/laravel-sweete'
+                        sh 'docker push $IMAGE_NAME:$IMAGE_TAG'
                     }
                 }
             }
