@@ -27,9 +27,9 @@ pipeline {
                 sshagent(['ssh-remote']) {
                     sh '''
                     ssh -o StrictHostKeyChecking=no -l root 45.77.250.80 <<'EOF'
-                    # Tạo nội dung file docker-compose.yml
                     mkdir -p /root/sweete_2
-                    echo "version: '3.7'
+                    cat << 'EOC' > /root/sweete_2/docker-compose.yml
+                    version: '3.7'
                     services:
                       sweete:
                         build:
@@ -47,9 +47,9 @@ pipeline {
                           - app-network
                     networks:
                       app-network:
-                        driver: bridge" > /root/sweete_2/docker-compose.yml
+                        driver: bridge
+                    EOC
 
-                    # Chuyển đến thư mục chứa file docker-compose.yml và chạy lệnh
                     cd /root/sweete_2
                     /snap/bin/docker-compose up -d
                     EOF
