@@ -48,11 +48,6 @@ pipeline {
                     networks:
                       app-network:
                         driver: bridge
-                    EOC
-
-                    cd /root/sweete_2
-                    /snap/bin/docker-compose up -d
-                    EOF
                     '''
                 }
             }
