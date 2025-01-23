@@ -58,7 +58,7 @@ pipeline {
                     sh '''
                         ssh -o StrictHostKeyChecking=no -l root 45.77.250.80 \
                         "cd /root/sweete_2" && \
-                        "docker-compose --version && docker pull hungit2002/laravel-sweete && docker-compose up -d"
+                        "/snap/bin/docker-compose --version && docker pull hungit2002/laravel-sweete && /snap/bin/docker-compose up -d"
                         '''
                 }
             }
