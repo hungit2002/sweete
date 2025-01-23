@@ -26,8 +26,37 @@ pipeline {
             steps {
                 sshagent(['ssh-remote']) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no -l root 45.77.250.80 \
-                    "/snap/bin/docker-compose --version && docker pull hungit2002/laravel-sweete && /snap/bin/docker-compose up -d"
+                    ssh -o StrictHostKeyChecking=no -l root 45.77.250.80 <<EOF
+                    # Tạo nội dung file docker-compose.yml
+                    cat <<EOL > /root/sweete_2/docker-compose.yml
+                    version: "3.7"
+                    services:
+                      sweete:
+                        build:
+                          context: ./
+                          dockerfile: Dockerfile
+                        image: sweete-img
+                        container_name: sweete-container
+                        restart: unless-stopped
+                        working_dir: /var/www/
+                        ports:
+                          - "8000:9000"
+                        volumes:
+                          - ./:/var/www/
+                        networks:
+                          - app-network
+
+                    networks:
+                      app-network:
+                        driver: bridge
+                    EOL
+
+                    # Chuyển đến thư mục chứa file docker-compose.yml
+                    cd /root/sweete_2
+
+                    # Chạy docker-compose
+                    /snap/bin/docker-compose up -d
+                    EOF
                     '''
                 }
             }
