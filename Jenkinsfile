@@ -52,5 +52,16 @@ pipeline {
                 }
             }
         }
+        stage('Run Image') {
+            steps {
+                sshagent(['ssh-remote']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no -l root 45.77.250.80 \
+                        "cd /root/sweete_2" && \
+                        "docker pull hungit2002/laravel-sweete && docker run -d --name laravel-sweete -p 80:80 hungit2002/laravel-sweete"
+                        '''
+                }
+            }
+        }
     }
 }
