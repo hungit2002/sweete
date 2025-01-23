@@ -57,7 +57,7 @@ pipeline {
                 sshagent(['ssh-remote']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no -l root 45.77.250.80 \
-                        "/snap/bin/docker-compose --version && docker pull hungit2002/laravel-sweete && /snap/bin/docker-compose up -d"
+                        "/snap/bin/docker-compose --version "
                         '''
                 }
             }
