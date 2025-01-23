@@ -24,7 +24,7 @@ pipeline {
         }
         stage('Deploy image') {
             steps {
-               sshagent(['ssh-remote-sweete-server']) {
+               sshagent(['ssh-remote']) {
                    sh 'ssh -o StrictHostKeyChecking=no -l root 45.77.250.80 docker pull hungit2002/laravel-sweete && docker-compose up -d'
                }
             }
