@@ -56,7 +56,6 @@ pipeline {
 
                     # Chạy docker-compose
                     /snap/bin/docker-compose up -d
-                    EOF
                     '''
                 }
             }
