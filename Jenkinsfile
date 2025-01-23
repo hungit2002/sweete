@@ -51,11 +51,10 @@ pipeline {
                         driver: bridge
                     EOL
 
-                    # Chuyển đến thư mục chứa file docker-compose.yml
+                    # Thực thi lệnh docker-compose
                     cd /root/sweete_2
-
-                    # Chạy docker-compose
                     /snap/bin/docker-compose up -d
+                    EOF
                     '''
                 }
             }
