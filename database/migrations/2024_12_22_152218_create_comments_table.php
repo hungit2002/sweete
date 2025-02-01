@@ -17,8 +17,6 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('post_id');
             $table->primary(['user_id', 'post_id']);
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('post_id')->references('id')->on('posts');
             $table->text('text');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');

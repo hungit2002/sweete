@@ -17,8 +17,6 @@ return new class extends Migration
             $table->unsignedBigInteger('conversation_id');
             $table->unsignedBigInteger('user_id');
             $table->primary(['conversation_id', 'user_id']);
-            $table->foreign('conversation_id')->references('id')->on('conversations');
-            $table->foreign('user_id')->references('id')->on('users');
             $table->dateTime('joined_at');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');

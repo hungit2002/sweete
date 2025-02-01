@@ -19,7 +19,6 @@ return new class extends Migration
             $table->tinyInteger('status')->default(0)->comment('0');
             $table->string('background');
             $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users');
             $table->tinyInteger('feeling');
             $table->string('checkin');
             $table->dateTime('created_at');

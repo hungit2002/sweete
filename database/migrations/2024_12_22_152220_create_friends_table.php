@@ -17,8 +17,6 @@ return new class extends Migration
             $table->unsignedBigInteger('friend_id');
             $table->unsignedBigInteger('user_id');
             $table->primary(['user_id', 'friend_id']);
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('friend_id')->references('id')->on('users');
             $table->tinyInteger('status')->default(0)->comment('0');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
