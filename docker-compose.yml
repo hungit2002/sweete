@@ -12,8 +12,6 @@ services:
       - "8000:9000"
     volumes:
       - ./:/var/www/
-      - ./storage:/var/www/storage
-      - ./bootstrap/cache:/var/www/bootstrap/cache
     networks:
       - app-network
 
