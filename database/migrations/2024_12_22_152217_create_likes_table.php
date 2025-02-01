@@ -13,11 +13,11 @@ return new class extends Migration {
         Schema::disableForeignKeyConstraints();
 
         Schema::create('likes', function (Blueprint $table) {
-            $table->foreign('user_id')->references('id')->on('users');
             $table->unsignedBigInteger('post_id');
             $table->unsignedBigInteger('user_id');
-            $table->foreign('post_id')->references('id')->on('posts');
             $table->primary(['post_id', 'user_id']);
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('post_id')->references('id')->on('posts');
             $table->dateTime('date_time');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');

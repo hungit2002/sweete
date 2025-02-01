@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('follows', function (Blueprint $table) {
-            $table->foreign('follower_id')->references('id')->on('users');
             $table->unsignedBigInteger('follower_id');
             $table->unsignedBigInteger('followed_id');
             $table->primary(['follower_id', 'followed_id']);
+            $table->foreign('follower_id')->references('id')->on('users');
             $table->foreign('followed_id')->references('id')->on('users');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');

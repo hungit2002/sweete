@@ -16,9 +16,9 @@ return new class extends Migration
         Schema::create('tags', function (Blueprint $table) {
             $table->unsignedBigInteger('post_id');
             $table->unsignedBigInteger('user_id');
-            $table->foreign('post_id')->references('id')->on('posts');
-	    $table->foreign('user_id')->references('id')->on('users');
             $table->primary(['post_id','user_id']);
+            $table->foreign('post_id')->references('id')->on('posts');
+	        $table->foreign('user_id')->references('id')->on('users');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
             $table->dateTime('deleted_at')->nullable();

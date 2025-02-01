@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('remarkable_news', function (Blueprint $table) {
-            $table->foreign('new_id')->references('id')->on('news');
             $table->unsignedBigInteger('new_id');
             $table->unsignedBigInteger('remarkable_id');
             $table->primary(['new_id', 'remarkable_id']);
+            $table->foreign('new_id')->references('id')->on('news');
             $table->foreign('remarkable_id')->references('id')->on('remarkables');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');

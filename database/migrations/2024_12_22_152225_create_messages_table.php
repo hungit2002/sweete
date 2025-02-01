@@ -14,10 +14,10 @@ return new class extends Migration {
 
         Schema::create('messages', function (Blueprint $table) {
             $table->unsignedBigInteger('conversation_id');
-            $table->foreign('conversation_id')->references('id')->on('conversations');
-            $table->foreign('sender_id')->references('id')->on('users');
             $table->unsignedBigInteger('sender_id');
             $table->primary(['conversation_id', 'sender_id']);
+            $table->foreign('sender_id')->references('id')->on('users');
+            $table->foreign('conversation_id')->references('id')->on('conversations');
             $table->text('message');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
