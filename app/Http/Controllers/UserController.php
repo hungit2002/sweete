@@ -152,12 +152,17 @@ class UserController extends Controller
             goto next;
         }
 
+        $jwt = $this->jwtService->createJwtToken([
+            'user_id' => $user[User::_ID],
+        ]);
+
         $data = [
             'code'     => rand(100000, 999999),
             'fullname' => $user[User::_FULLNAME],
+            'url'      => Config('environment.ROOT_DOMAIN') . '/submit-forgot-password?token='.$jwt
         ];
         try {
-            $this->mailService->sendMail($user[User::_EMAIL], new ForgotPasswordEmail($data['code']));
+            $this->mailService->sendMail($user[User::_EMAIL], new ForgotPasswordEmail($data));
         } catch (\Exception $exception) {
             $this->message = $exception->getMessage();
             $this->code    = 500;

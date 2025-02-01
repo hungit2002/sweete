@@ -1,12 +1,12 @@
 <?php
 if (env('APP_ENV') == 'live'){
-    $rootDomain = "http://localhost:9000";
+    $rootDomain = "https://sweete.id.vn";
     $appDomain = "http://localhost:3000";
 } else if (env('APP_ENV') == 'dev'){
-    $rootDomain = "http://localhost:9000";
+    $rootDomain = "https://sweete.id.vn";
     $appDomain = "http://localhost:3000";
 } else {
-    $rootDomain = "http://localhost:9000";
+    $rootDomain = "http://localhost:8000";
     $appDomain = "http://localhost:3000";
 }
 return [
