@@ -16,6 +16,8 @@ use App\Services\Email\MailService;
 use App\Services\Email\MailServiceInterface;
 use App\Services\Jwt\JwtService;
 use App\Services\Jwt\JwtServiceInterface;
+use App\Services\User\IUserServiceInterface;
+use App\Services\User\UserService;
 use App\Usecases\Friend\FriendUsecase;
 use App\Usecases\Friend\FriendUsecaseInterface;
 use App\Usecases\Post\PostUsecase;
@@ -72,6 +74,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(
             FriendUsecaseInterface::class,
             FriendUsecase::class
+        );
+        $this->app->singleton(
+            IUserServiceInterface::class,
+            UserService::class
         );
     }
 

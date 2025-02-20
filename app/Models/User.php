@@ -14,7 +14,7 @@ class User extends Model
     const _ID = 'id';
     const _PHONE = 'phone';
     const _EMAIL = 'email';
-    const _FULLNAME = 'fullname';
+    const _FULLNAME = 'full_name';
     const _ADDRESS = 'address';
     const _EDUCATION_INFO = 'education_info';
     const _WORK_INFO = 'work_info';
