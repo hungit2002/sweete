@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('background');
             $table->unsignedBigInteger('user_id');
             $table->tinyInteger('feeling');
-            $table->string('checkin');
+            $table->string('checkin', 500);
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
             $table->dateTime('deleted_at')->nullable();

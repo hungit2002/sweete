@@ -76,10 +76,12 @@ class Controller extends BaseController
     protected function responseData(mixed $data = [], array|string $more = '', int $code = 200)
     {
         $res = [
-            'status'  => $this->status,
-            'message' => $this->message,
-            'code'    => $this->code,
-            'data'    => $data
+            'meta' => [
+                'status' => $this->status,
+                'code' => $this->code,
+                'message' => $this->message,
+            ],
+            'result' => $data,
         ];
         if ($more) {
             $res = array_merge($res, $more);

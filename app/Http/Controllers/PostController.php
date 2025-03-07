@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Repositories\Feel\FeelRepositoryInterface;
 use App\Usecases\Post\PostUsecaseInterface;
 use Illuminate\Http\Request;
 
@@ -10,26 +11,29 @@ class PostController extends Controller
 {
     protected Request $request;
     protected PostUsecaseInterface $postUsecase;
+    protected FeelRepositoryInterface $feelRepo;
     public function __construct(
         Request $request,
-        PostUsecaseInterface $postUsecase
+        PostUsecaseInterface $postUsecase,
+        FeelRepositoryInterface $feelRepo
     )
     {
         $this->request = $request;
         $this->postUsecase = $postUsecase;
+        $this->feelRepo = $feelRepo;
     }
 
     public function createPost()
     {
         $validated = $this->validateBase($this->request, [
+            'user_id'    => 'integer|required',
             'content'    => 'required',
-            'status'     => 'required',
-            'feeling'    => 'int',
-            'checkin'    => 'string',
-            'background' => 'string',
-            'tags'       => 'array',
             'images'     => 'array',
-            'user_id'    => 'integer|required'
+            'friends'    => 'array',
+            'feeling'    => 'int',
+            'status'     => 'required',
+            'background' => 'string',
+            'checkin'    => 'string',
         ]);
         if ($validated) {
             $this->message = "validation fail";
@@ -37,35 +41,32 @@ class PostController extends Controller
             return $this->responseData($validated);
         }
         $data = [];
-
         $userID        = $this->request->get('user_id');
         $content       = $this->request->get('content');
-        $status        = $this->request->get('status');
-        $feeling       = $this->request->get('feeling');
-        $checkin       = $this->request->get('checkin');
-        $background    = $this->request->get('background');
-        $tags          = $this->request->get('tags');
         $images        = $this->request->get('images');
-        $friendsView   = $this->request->get('friends_view') ?? [];
-        $friendsExpect = $this->request->get('friends_expect') ?? [];
+        $friends       = $this->request->get('friends');
+        $feeling       = $this->request->get('feeling');
+        $status        = $this->request->get('status');
+        $background    = $this->request->get('background');
+        $checkin       = $this->request->get('checkin');
+
+        $feel = $this->feelRepo->find($feeling);
+        if (!$feel){
+            $this->message = "feel not found";
+            $this->code = 400;
+            goto next;
+        }
 
         // check feels
-        if (!in_array($status, Post::LIST_STATUS)) {
+        if (!in_array($status['type'], Post::LIST_STATUS)) {
             $this->message = "status incorrect";
             $this->code    = 422;
             goto next;
         }
-        // check feelings
-        if (!in_array($feeling, Post::LIST_FEEL)) {
-            $this->message = "feeling incorrect";
-            $this->code    = 422;
-            goto next;
-        }
 
-        list($checked, $data) = $this->postUsecase->createPost($userID, $content, $status, $feeling, $checkin,
-            $background, $tags, $images, $friendsView, $friendsExpect);
-        if (!$checked) {
-            $this->message = "create post fail";
+        list($checked,$message,$data) = $this->postUsecase->createPost($userID, $content, $images, $friends, $feeling, $status, $background, $checkin);
+        if (!$checked){
+            $this->message = $message;
             $this->code    = 400;
             goto next;
         }

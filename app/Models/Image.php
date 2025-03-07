@@ -15,6 +15,7 @@ class Image extends Model
     const _ORIGIN_NAME = 'origin_name';
     const _SIZE = 'size';
     const _TYPE = 'type';
+    const _NOTE = 'note';
     const _POST_ID = 'post_id';
     const _NEW_ID = 'new_id';
     const _REMARKABLE_ID = 'remarkable_id';
@@ -34,6 +35,7 @@ class Image extends Model
         self::_ORIGIN_NAME,
         self::_SIZE,
         self::_TYPE,
+        self::_NOTE,
         self::_POST_ID,
         self::_NEW_ID,
         self::_REMARKABLE_ID,

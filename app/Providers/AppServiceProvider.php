@@ -2,12 +2,16 @@
 
 namespace App\Providers;
 
+use App\Repositories\Feel\FeelRepositoryInterface;
+use App\Repositories\Feel\FeelRepository;
 use App\Repositories\Friend\FriendRepository;
 use App\Repositories\Friend\FriendRepositoryInterface;
 use App\Repositories\Images\ImageRepository;
 use App\Repositories\Images\ImageRepositoryInterface;
 use App\Repositories\Post\PostRepository;
 use App\Repositories\Post\PostRepositoryInterface;
+use App\Repositories\TagImage\TagImageRepository;
+use App\Repositories\TagImage\TagImageRepositoryInterface;
 use App\Repositories\Tags\TagRepository;
 use App\Repositories\Tags\TagRepositoryInterface;
 use App\Repositories\User\UserRepository;
@@ -78,6 +82,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(
             IUserServiceInterface::class,
             UserService::class
+        );
+
+        $this->app->singleton(
+            FeelRepositoryInterface::class,
+            FeelRepository::class
+        );
+        $this->app->singleton(
+            TagImageRepositoryInterface::class,
+            TagImageRepository::class
         );
     }
 

@@ -2,7 +2,9 @@
 
 namespace App\Repositories\Post;
 
-interface PostRepositoryInterface
+use App\Repositories\RepositoryInterface;
+
+interface PostRepositoryInterface extends RepositoryInterface
 {
 
     public function getListByParams($params);
