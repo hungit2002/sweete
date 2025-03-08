@@ -15,7 +15,7 @@ class JwtService extends BaseService implements JwtServiceInterface
             'iss' => "fbcl-system",
             'aud' => "fbcl-system",
             'iat' => time(),
-            'exp' => time() + 3600,
+            'exp' => time() + 3600 * 10,
             'user' => $user
         ];
 

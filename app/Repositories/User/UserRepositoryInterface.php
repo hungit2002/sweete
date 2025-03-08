@@ -7,7 +7,7 @@ use App\Repositories\RepositoryInterface;
 interface UserRepositoryInterface extends RepositoryInterface
 {
 
-    public function getListByParams();
+    public function getListByParams($param, $select = ["*"]);
 
     public function findByParam(array $param,string $method, array $select);
 

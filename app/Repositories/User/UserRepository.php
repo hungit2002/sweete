@@ -14,10 +14,16 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         return User::class;
     }
 
-    public function getListByParams()
+    public function getListByParams($param,$select = ["*"])
     {
         // TODO: Implement getListByParams() method.
-        return $this->_model->get();
+        $query = $this->_model->select($select)->whereNull(User::_DELETED_AT);
+        $query = $this->queryByParam($query, $param);
+
+        if (isset($param['limit'])){
+            $query->limit($param['limit']);
+        }
+        return $query->get();
     }
 
     public function findByParam(array $param, $method = "get", $select = ["*"])
@@ -74,5 +80,16 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     public function getUserInfoByUserIDs($friendIDs, array $select=["*"])
     {
         return $this->_model->whereIn(User::_ID, $friendIDs)->select($select)->whereNull(User::_DELETED_AT)->get();
+    }
+
+    private function queryByParam($query, $param)
+    {
+        if (isset($param['full_name'])) {
+            $query = $query->where('full_name', 'like', '%' . $param['full_name'] . '%');
+        }
+        if (isset($param['ids'])) {
+            $query = $query->whereIn(User::_ID, $param['ids']);
+        }
+        return $query;
     }
 }

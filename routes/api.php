@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FriendController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,5 +36,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('get-list-post', [PostController::class, 'getListPost']);
         // user
         Route::get('get-user-info', [UserController::class, 'getUserInfo']);
+        // friend
+        Route::get('get-friends-by-param',[FriendController::class, 'getFriendByParam']);
     });
 });
