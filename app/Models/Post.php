@@ -138,11 +138,13 @@ class Post extends Model
     const STATUS_ONLY_ME = 2;
     const STATUS_FRIEND_SPECIFIC = 3;
     const STATUS_FRIEND_EXPECT = 4;
+    const STATUS_CUSTOM = 5;
     const LIST_STATUS = [
         self::STATUS_PUBLIC,
         self::STATUS_FRIENDS,
         self::STATUS_ONLY_ME,
         self::STATUS_FRIEND_SPECIFIC,
-        self::STATUS_FRIEND_EXPECT
+        self::STATUS_FRIEND_EXPECT,
+        self::STATUS_CUSTOM,
     ];
 }
