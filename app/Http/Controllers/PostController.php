@@ -49,6 +49,7 @@ class PostController extends Controller
         $status        = $this->request->get('status');
         $background    = $this->request->get('background');
         $checkin       = $this->request->get('checkin');
+        $gifs          = $this->request->get('gifs');
 
         $feel = $this->feelRepo->find($feeling);
         if (!$feel){
@@ -63,8 +64,7 @@ class PostController extends Controller
             $this->code    = 422;
             goto next;
         }
-
-        list($checked,$message,$data) = $this->postUsecase->createPost($userID, $content, $images, $friends, $feeling, $status, $background, $checkin);
+        list($checked,$message,$data) = $this->postUsecase->createPost($userID, $content, $images, $friends, $feeling, $status, $background, $checkin, $gifs);
         if (!$checked){
             $this->message = $message;
             $this->code    = 400;

@@ -36,7 +36,7 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
         $this->tagImageRepo = $tagImageRepo;
     }
 
-    public function createPost($userID,$content, $images, $friends, $feeling, $status, $background, $checkin)
+    public function createPost($userID,$content, $images, $friends, $feeling, $status, $background, $checkin, $gifs)
     {
         $user = $this->userRepo->find($userID);
         if (!$user){
@@ -55,21 +55,31 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
         DB::beginTransaction();
         try {
             $post = $this->postRepo->create($newPost);
-
             $tags = $this->prepareDataTagsInsert($post->id, $friends);
             $this->tagsRepo->insert($tags);
 
             $results = $this->createImages($post->id, $images);
+            $gifs = $this->imageRepo->insert($this->prepareDataInsertGifs($post->id, $gifs));
 
             if ($status['type'] === Post::STATUS_FRIEND_SPECIFIC){
-                $this->postRepo->update($post->id, [Post::_FRIENDS_VIEW => json_encode($status['friend_only'])]);
+                $this->postRepo->update($post->id, [
+                    Post::_FRIENDS_VIEW => json_encode(array_column($status['friends_specific'],'id'))
+                ]);
             } else if ($status['type'] === Post::STATUS_FRIEND_EXPECT){
-                $this->postRepo->update($post->id, [Post::_FRIENDS_EXPECT => json_encode($status['friend_expect'])]);
+                $this->postRepo->update($post->id, [
+                    Post::_FRIENDS_EXPECT => json_encode(array_column($status['friends_expect'],'id'))
+                ]);
+            } else if ($status['type'] === Post::STATUS_CUSTOM){
+                $this->postRepo->update($post->id, [
+                    Post::_FRIENDS_VIEW => json_encode(array_column($status['friends_specific'],'id')),
+                    Post::_FRIENDS_EXPECT => json_encode(array_column($status['friends_expect'],'id'))
+                ]);
             }
             DB::commit();
             return [true, "success", [
                 "post" => $post,
-                "images" => $results
+                "images" => $results,
+                "gifts" => $gifs
             ]];
         } catch (\Exception $e) {
             DB::rollBack();
@@ -85,7 +95,7 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
         foreach ($friends as $friend){
             $dataInsert[] = [
                 Tag::_POST_ID => $postID,
-                Tag::_USER_ID => $friend,
+                Tag::_USER_ID => $friend['id'],
                 Tag::_CREATED_AT => date('Y-m-d H:i:s'),
                 Tag::_UPDATED_AT => date('Y-m-d H:i:s')
             ];
@@ -129,6 +139,23 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
                 TagsImage::_USER_ID => $friend,
                 Tag::_CREATED_AT => date('Y-m-d H:i:s'),
                 Tag::_UPDATED_AT => date('Y-m-d H:i:s')
+            ];
+        }
+        return $dataInsert;
+    }
+
+    private function prepareDataInsertGifs($id, $gifs)
+    {
+        $dataInsert = [];
+        foreach ($gifs as $gif){
+            $dataInsert[] = [
+                Image::_PATH => $gif['url'],
+                Image::_ORIGIN_NAME => $gif['name'],
+                Image::_SIZE => $gif['size'],
+                Image::_TYPE => $gif['type'],
+                Image::_POST_ID => $id,
+                Image::_CREATED_AT => date('Y-m-d H:i:s'),
+                Image::_UPDATED_AT => date('Y-m-d H:i:s')
             ];
         }
         return $dataInsert;
