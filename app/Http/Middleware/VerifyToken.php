@@ -59,7 +59,6 @@ class VerifyToken
             ];
             return $user;
         }
-
         try {
             $decode_token = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
         } catch (ExpiredException|\Exception $e) {
