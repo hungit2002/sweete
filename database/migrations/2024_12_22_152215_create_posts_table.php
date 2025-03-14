@@ -19,7 +19,7 @@ return new class extends Migration
             $table->tinyInteger('status')->default(0)->comment('0');
             $table->string('background');
             $table->unsignedBigInteger('user_id');
-            $table->tinyInteger('feeling');
+            $table->tinyInteger('feeling')->nullable();
             $table->string('checkin', 500);
             $table->dateTime('created_at');
             $table->dateTime('updated_at');

@@ -51,11 +51,13 @@ class PostController extends Controller
         $checkin       = $this->request->get('checkin');
         $gifs          = $this->request->get('gifs');
 
-        $feel = $this->feelRepo->find($feeling);
-        if (!$feel){
-            $this->message = "feel not found";
-            $this->code = 400;
-            goto next;
+        if (isset($feeling)){
+            $feel = $this->feelRepo->find($feeling);
+            if (!$feel){
+                $this->message = "feel not found";
+                $this->code = 400;
+                goto next;
+            }
         }
 
         // check feels
