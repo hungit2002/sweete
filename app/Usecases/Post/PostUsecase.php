@@ -6,6 +6,7 @@ use App\Models\Image;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\TagsImage;
+use App\Models\User;
 use App\Repositories\Images\ImageRepositoryInterface;
 use App\Repositories\Post\PostRepositoryInterface;
 use App\Repositories\TagImage\TagImageRepositoryInterface;
@@ -21,11 +22,12 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
     protected ImageRepositoryInterface $imageRepo;
     protected UserRepositoryInterface $userRepo;
     protected TagImageRepositoryInterface $tagImageRepo;
+
     public function __construct(
-        PostRepositoryInterface $postRepo,
-        TagRepositoryInterface $tagsRepo,
-        ImageRepositoryInterface $imageRepo,
-        UserRepositoryInterface $userRepo,
+        PostRepositoryInterface     $postRepo,
+        TagRepositoryInterface      $tagsRepo,
+        ImageRepositoryInterface    $imageRepo,
+        UserRepositoryInterface     $userRepo,
         TagImageRepositoryInterface $tagImageRepo,
     )
     {
@@ -36,10 +38,10 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
         $this->tagImageRepo = $tagImageRepo;
     }
 
-    public function createPost($userID,$content, $images, $friends, $feeling, $status, $background, $checkin, $gifs)
+    public function createPost($userID, $content, $images, $friends, $feeling, $status, $background, $checkin, $gifs)
     {
         $user = $this->userRepo->find($userID);
-        if (!$user){
+        if (!$user) {
             goto next;
         }
         $newPost = [
@@ -61,18 +63,18 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
             $results = $this->createImages($post->id, $images);
             $gifs = $this->imageRepo->insert($this->prepareDataInsertGifs($post->id, $gifs));
 
-            if ($status['type'] === Post::STATUS_FRIEND_SPECIFIC){
+            if ($status['type'] === Post::STATUS_FRIEND_SPECIFIC) {
                 $this->postRepo->update($post->id, [
-                    Post::_FRIENDS_VIEW => json_encode(array_column($status['friends_specific'],'id'))
+                    Post::_FRIENDS_VIEW => json_encode(array_column($status['friends_specific'], 'id'))
                 ]);
-            } else if ($status['type'] === Post::STATUS_FRIEND_EXPECT){
+            } else if ($status['type'] === Post::STATUS_FRIEND_EXPECT) {
                 $this->postRepo->update($post->id, [
-                    Post::_FRIENDS_EXPECT => json_encode(array_column($status['friends_expect'],'id'))
+                    Post::_FRIENDS_EXPECT => json_encode(array_column($status['friends_expect'], 'id'))
                 ]);
-            } else if ($status['type'] === Post::STATUS_CUSTOM){
+            } else if ($status['type'] === Post::STATUS_CUSTOM) {
                 $this->postRepo->update($post->id, [
-                    Post::_FRIENDS_VIEW => json_encode(array_column($status['friends_specific'],'id')),
-                    Post::_FRIENDS_EXPECT => json_encode(array_column($status['friends_expect'],'id'))
+                    Post::_FRIENDS_VIEW => json_encode(array_column($status['friends_specific'], 'id')),
+                    Post::_FRIENDS_EXPECT => json_encode(array_column($status['friends_expect'], 'id'))
                 ]);
             }
             DB::commit();
@@ -86,13 +88,13 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
             return [false, $e->getMessage(), null];
         }
         next:
-        return [false,"" , null];
+        return [false, "", null];
     }
 
     private function prepareDataTagsInsert($postID, $friends)
     {
         $dataInsert = [];
-        foreach ($friends as $friend){
+        foreach ($friends as $friend) {
             $dataInsert[] = [
                 Tag::_POST_ID => $postID,
                 Tag::_USER_ID => $friend['id'],
@@ -102,9 +104,46 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
         }
         return $dataInsert;
     }
-    public function getListPost ($params) {
-        $post = $this->postRepo->getListByParams($params);
-        return $post;
+
+    public function getListPost($params)
+    {
+
+        $params["with"] = [
+            "tags" => function ($query) {
+                $query->select([
+                    User::TABLE . '.' . User::_ID,
+                    User::TABLE . '.' . User::_FULLNAME,
+                    User::TABLE . '.' . User::_AVATAR,
+                ]);
+            },
+            "images" => function ($query) {
+                $query->select([
+                    Image::TABLE . '.' . Image::_ID,
+                    Image::TABLE . '.' . Image::_PATH,
+                    Image::TABLE . '.' . Image::_ORIGIN_NAME,
+                    Image::TABLE . '.' . Image::_NOTE,
+                    Image::TABLE . '.' . Image::_POST_ID,
+                    Image::TABLE . '.' . Image::_TYPE,
+                ]);
+            },
+            "images.tagImages" => function ($query) {
+                $query->select([
+                    User::TABLE . '.' . User::_ID,
+                    User::TABLE . '.' . User::_FULLNAME,
+                    User::TABLE . '.' . User::_AVATAR,
+                ]);
+            },
+            "user" => function ($query) {
+                $query->select([
+                    User::TABLE . '.' . User::_ID,
+                    User::TABLE . '.' . User::_FULLNAME,
+                    User::TABLE . '.' . User::_AVATAR,
+                ]);
+            }
+        ];
+        $posts = $this->postRepo->getListByParams($params)->toArray();
+        $friends = $this->getFriendInfos($posts);
+        return [$posts, $friends];
     }
 
     private function createImages($postID, $images)
@@ -121,11 +160,11 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
                 Image::_CREATED_AT => date('Y-m-d H:i:s'),
                 Image::_UPDATED_AT => date('Y-m-d H:i:s')
             ];
-            $image = $this->imageRepo->create($newImage);
-            if ($image && !empty($image['friends'])){
-                $this->tagImageRepo->insert($this->prepareTagImageDataInsert($image->id, $image->friends));
+            $imageResult = $this->imageRepo->create($newImage);
+            if ($image && $image['friends']) {
+                $this->tagImageRepo->insert($this->prepareTagImageDataInsert($imageResult->id, $image['friends']));
             }
-            $results[] = $image['id'];
+            $results[] = $imageResult['id'];
         }
         return $results;
     }
@@ -133,10 +172,10 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
     private function prepareTagImageDataInsert($id, $friends)
     {
         $dataInsert = [];
-        foreach ($friends as $friend){
+        foreach ($friends as $friend) {
             $dataInsert[] = [
                 TagsImage::_IMAGE_ID => $id,
-                TagsImage::_USER_ID => $friend,
+                TagsImage::_USER_ID => $friend["id"],
                 Tag::_CREATED_AT => date('Y-m-d H:i:s'),
                 Tag::_UPDATED_AT => date('Y-m-d H:i:s')
             ];
@@ -147,7 +186,7 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
     private function prepareDataInsertGifs($id, $gifs)
     {
         $dataInsert = [];
-        foreach ($gifs as $gif){
+        foreach ($gifs as $gif) {
             $dataInsert[] = [
                 Image::_PATH => $gif['url'],
                 Image::_ORIGIN_NAME => $gif['name'],
@@ -159,5 +198,39 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
             ];
         }
         return $dataInsert;
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    public function extractedFriendIDsInStatusPost($data)
+    {
+        $friendViews = array_column($data, "friends_view");
+        $friendExpect = array_column($data, "friends_expect");
+
+        $friendViews = array_filter($friendViews, function ($value) {
+            return is_array(json_decode($value, true));
+        });
+        $friendExpect = array_filter($friendExpect, function ($value) {
+            return is_array(json_decode($value, true));
+        });
+
+        $friendIDs = array_merge($friendViews, $friendExpect);
+        $friendIDs = array_merge(...array_map(fn($item) => json_decode($item, true), $friendIDs));
+        return array_unique($friendIDs);
+    }
+
+    private function getFriendInfos($posts)
+    {
+        $friendIDsStatus = $this->extractedFriendIDsInStatusPost($posts['data']);
+        $param = [
+            'ids' => $friendIDsStatus,
+        ];
+        $select = [
+            User::_ID,
+            User::_FULLNAME,
+        ];
+        return $this->userRepo->getListByParams($param, $select)->keyBy(User::_ID)->toArray();
     }
 }

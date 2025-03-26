@@ -80,4 +80,29 @@ class UserUsecase extends BaseUsecase implements UserUsecaseInterface
         ];
         return $data;
     }
+
+    public function getUserDetail($id)
+    {
+        $select = [
+            User::_ID,
+            User::_PHONE,
+            User::_EMAIL,
+            User::_FULLNAME,
+            User::_ADDRESS,
+            User::_EDUCATION_INFO,
+            User::_WORK_INFO,
+            User::_GENDER,
+            User::_RELATIONSHIP,
+            User::_DOB,
+            User::_AVATAR,
+            User::_POSTER,
+            User::_PASSWORD,
+            User::_CREATED_AT,
+            User::_UPDATED_AT,
+            User::_DELETED_AT
+        ];
+
+        $user = $this->userRepo->getByID($id, $select);
+        return $user;
+    }
 }

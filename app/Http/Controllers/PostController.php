@@ -82,7 +82,7 @@ class PostController extends Controller
     public function getListPost()
     {
         $validated = $this->validateBase($this->request, [
-            'user_id' => 'integer|required'
+            'user_id' => 'integer'
         ]);
         if ($validated) {
             $this->message = "validation fail";
@@ -94,10 +94,13 @@ class PostController extends Controller
 
         $params['user_id'] = $userID;
         $params['per_page'] = $perPage;
-        $posts              = $this->postUsecase->getListPost($params);
+        list($posts,$friends)              = $this->postUsecase->getListPost($params);
 
         $this->message = 'get list post success';
         $this->status  = 'success';
-        return $this->responseData($posts);
+        return $this->responseData([
+            'posts' => $posts,
+            'friends' => $friends
+        ]);
     }
 }

@@ -7,4 +7,6 @@ interface UserUsecaseInterface
     public function updateUserByParams($id, array $dataUpdate);
 
     public function getUserInfo(mixed $userID);
+
+    public function getUserDetail($id);
 }

@@ -36,6 +36,8 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('get-list-post', [PostController::class, 'getListPost']);
         // user
         Route::get('get-user-info', [UserController::class, 'getUserInfo']);
+        Route::get('get-user-detail', [UserController::class, 'getUserDetail']);
+        Route::post('update-poster', [UserController::class, 'updatePoster']);
         // friend
         Route::get('get-friends-by-param',[FriendController::class, 'getFriendByParam']);
     });

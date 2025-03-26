@@ -2,6 +2,9 @@
 
 namespace App\Services\User;
 
+use App\Models\Image;
+use App\Models\User;
+use App\Repositories\Images\ImageRepository;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Services\BaseService;
 
@@ -12,11 +15,14 @@ use Illuminate\Support\Facades\Log;
 class UserService extends BaseService implements IUserServiceInterface
 {
     protected UserRepositoryInterface $userRepo;
+    protected ImageRepository $imageRepo;
     public function __construct(
-        UserRepositoryInterface $userRepo
+        UserRepositoryInterface $userRepo,
+        ImageRepository $imageRepo
     )
     {
         $this->userRepo = $userRepo;
+        $this->imageRepo = $imageRepo;
     }
 
     public function insertUser()
@@ -51,5 +57,30 @@ class UserService extends BaseService implements IUserServiceInterface
         $user = $this->userRepo->create($newUser);
         Log::info('New user created', ['user' => $user]);
         return $user;
+    }
+
+    public function updatePoster($userID, $url, $size, $type, $name)
+    {
+        $user = $this->userRepo->find($userID);
+        if (!$user) {
+            return [false, "user not found", null];
+        }
+
+        $image = new Image();
+        $image->fill([
+            Image::_PATH => $url,
+            Image::_TYPE => $type,
+            Image::_SIZE => $size,
+            Image::_ORIGIN_NAME => $name,
+            Image::_CREATED_AT => now(),
+            Image::_UPDATED_AT => now(),
+        ]);
+        $image->save();
+        if (isset($image[Image::_ID])){
+            $this->userRepo->update($userID,[
+                User::_POSTER => $image[Image::_ID]
+            ]);
+        }
+        return [true, "update poster success", $image];
     }
 }

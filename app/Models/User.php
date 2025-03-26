@@ -61,4 +61,13 @@ class User extends Model
     protected $hidden = [
         'password',
     ];
+
+    public function friends()
+    {
+        return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id')->whereNull(Friend::TABLE . '.' . Friend::_DELETED_AT);
+    }
+
+    public function poster(){
+        return $this->hasOne(Image::class, 'id', 'poster')->whereNull(Image::TABLE . '.' . Image::_DELETED_AT);
+    }
 }

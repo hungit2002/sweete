@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Image extends Model
 {
     use Authenticatable, HasFactory;
+
     const TABLE = 'images';
     const _ID = 'id';
     const _PATH = 'path';
@@ -43,4 +44,9 @@ class Image extends Model
         self::_UPDATED_AT,
         self::_DELETED_AT,
     ];
+
+    public function tagImages()
+    {
+        return $this->belongsToMany(User::class, TagsImage::TABLE, TagsImage::_IMAGE_ID, TagsImage::_USER_ID)->whereNull(TagsImage::TABLE . '.' . TagsImage::_DELETED_AT);
+    }
 }

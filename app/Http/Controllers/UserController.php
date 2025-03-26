@@ -7,70 +7,75 @@ use App\Models\User;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Services\Email\MailServiceInterface;
 use App\Services\Jwt\JwtServiceInterface;
+use App\Services\User\UserService;
 use App\Usecases\User\UserUsecaseInterface;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    protected Request                 $request;
-    protected JwtServiceInterface     $jwtService;
-    protected MailServiceInterface    $mailService;
-    protected UserUsecaseInterface    $userUsecase;
+    protected Request $request;
+    protected JwtServiceInterface $jwtService;
+    protected MailServiceInterface $mailService;
+    protected UserUsecaseInterface $userUsecase;
     protected UserRepositoryInterface $userRepo;
+    protected UserService $userService;
 
     public function __construct(
-        Request $request,
-        JwtServiceInterface $jwtService,
-        MailServiceInterface $mailService,
-        UserUsecaseInterface $userUsecase,
+        Request                 $request,
+        JwtServiceInterface     $jwtService,
+        MailServiceInterface    $mailService,
+        UserUsecaseInterface    $userUsecase,
         UserRepositoryInterface $userRepo,
-    ) {
-        $this->request     = $request;
-        $this->jwtService  = $jwtService;
+        UserService             $userService
+    )
+    {
+        $this->request = $request;
+        $this->jwtService = $jwtService;
         $this->mailService = $mailService;
         $this->userUsecase = $userUsecase;
-        $this->userRepo    = $userRepo;
+        $this->userRepo = $userRepo;
+        $this->userService = $userService;
     }
 
     public function register()
     {
         $validated = $this->validateBase($this->request, [
-            'firstname'     => 'required',
-            'surname'       => 'required',
+            'firstname' => 'required',
+            'surname' => 'required',
             'date_of_birth' => 'required',
-            'gender'        => 'required',
-            'phone'         => 'required_without:email',
-            'email'         => 'required_without:phone|email',
-            'password'      => 'required',
+            'gender' => 'required',
+            'phone' => 'required_without:email',
+            'email' => 'required_without:phone|email',
+            'password' => 'required',
         ]);
         if ($validated) {
-            $this->message = "validation fail";
-            $this->code    = 422;
+            $this->message = 'validation fail';
+            $this->code = 422;
             return $this->responseData($validated);
         }
-        $firstname   = $this->request->get('firstname');
-        $surname     = $this->request->get('surname');
+        $firstname = $this->request->get('firstname');
+        $surname = $this->request->get('surname');
         $dateOfBirth = $this->request->get('date_of_birth');
-        $gender      = $this->request->get('gender');
-        $phone       = $this->request->get('phone');
-        $email       = $this->request->get('email');
-        $password    = $this->request->get('password');
+        $gender = $this->request->get('gender');
+        $phone = $this->request->get('phone');
+        $email = $this->request->get('email');
+        $password = $this->request->get('password');
 
         $data = [];
         // check phone or email
         $exited = $this->userRepo->findByPhoneOrEmail($phone, $email);
         if ($exited) {
-            $this->message = "user already exists";
-            $this->code    = 400;
+            $this->message = 'user already exists';
+            $this->code = 400;
             return $this->responseData($data);
         }
 
         $newUser = [
-            User::_PHONE      => $phone,
-            User::_EMAIL      => $email,
-            User::_DOB        => $dateOfBirth,
-            User::_FULLNAME   => $firstname . " " . $surname,
-            User::_GENDER     => $gender,
+            User::_PHONE => $phone,
+            User::_EMAIL => $email,
+            User::_DOB => $dateOfBirth,
+            User::_FULLNAME => $firstname . ' ' . $surname,
+            User::_GENDER => $gender,
             User::_CREATED_AT => date('Y-m-d H:i:s'),
             User::_UPDATED_AT => date('Y-m-d H:i:s'),
         ];
@@ -80,54 +85,54 @@ class UserController extends Controller
         $newUser[User::_PASSWORD] = $hashedPassword;
 
         $userCreated = $this->userRepo->create($newUser);
-        $token       = $this->jwtService->createJwtToken($userCreated);
+        $token = $this->jwtService->createJwtToken($userCreated);
 
-        $data          = [
-            'user'         => $userCreated,
+        $data = [
+            'user' => $userCreated,
             'access_token' => $token
         ];
-        $this->status  = "success";
-        $this->message = "user registered successfully";
+        $this->status = 'success';
+        $this->message = 'user registered successfully';
         return $this->responseData($data);
     }
 
     public function login()
     {
         $validated = $this->validateBase($this->request, [
-            'email'    => 'required_without:phone|email',
-            'phone'    => 'required_without:email',
+            'email' => 'required_without:phone|email',
+            'phone' => 'required_without:email',
             'password' => 'required',
         ]);
         if ($validated) {
-            $this->message = "validation fail";
-            $this->code    = 422;
+            $this->message = 'validation fail';
+            $this->code = 422;
             return $this->responseData($validated);
         }
-        $email    = $this->request->get('email');
-        $phone    = $this->request->get('phone');
+        $email = $this->request->get('email');
+        $phone = $this->request->get('phone');
         $password = $this->request->get('password');
 
         $data = [];
         $user = $this->userRepo->findByPhoneOrEmail($phone, $email);
         if (!$user) {
-            $this->message = "user not found";
-            $this->code    = 404;
+            $this->message = 'user not found';
+            $this->code = 404;
             goto next;
         }
         $checkPassword = password_verify($password, $user->password);
         if (!$checkPassword) {
-            $this->message = "wrong password";
-            $this->code    = 400;
+            $this->message = 'wrong password';
+            $this->code = 400;
             goto next;
         }
         $token = $this->jwtService->createJwtToken($user);
-        $data  = [
-            'user'         => $user,
+        $data = [
+            'user' => $user,
             'access_token' => $token
         ];
 
-        $this->status  = "success";
-        $this->message = "user logged in successfully";
+        $this->status = 'success';
+        $this->message = 'user logged in successfully';
         next:
         return $this->responseData($data);
     }
@@ -138,8 +143,8 @@ class UserController extends Controller
             'email' => 'required|email',
         ]);
         if ($validated) {
-            $this->message = "validation fail";
-            $this->code    = 422;
+            $this->message = 'validation fail';
+            $this->code = 422;
             return $this->responseData($validated);
         }
         $email = $this->request->get('email');
@@ -147,8 +152,8 @@ class UserController extends Controller
         $data = [];
         $user = $this->userRepo->findByEmail($email);
         if (!$user) {
-            $this->message = "user not found";
-            $this->code    = 404;
+            $this->message = 'user not found';
+            $this->code = 404;
             goto next;
         }
 
@@ -157,20 +162,20 @@ class UserController extends Controller
         ]);
 
         $data = [
-            'code'     => rand(100000, 999999),
+            'code' => rand(100000, 999999),
             'fullname' => $user[User::_FULLNAME],
-            'url'      => Config('environment.ROOT_DOMAIN') . '/submit-forgot-password?token='.$jwt
+            'url' => Config('environment.ROOT_DOMAIN') . '/submit-forgot-password?token=' . $jwt
         ];
         try {
             $this->mailService->sendMail($user[User::_EMAIL], new ForgotPasswordEmail($data));
         } catch (\Exception $exception) {
             $this->message = $exception->getMessage();
-            $this->code    = 500;
+            $this->code = 500;
             goto next;
         }
 
-        $this->status  = "success";
-        $this->message = "user forgotten password successfully";
+        $this->status = 'success';
+        $this->message = 'user forgotten password successfully';
         next:
         return $this->responseData($data);
     }
@@ -181,28 +186,28 @@ class UserController extends Controller
             'token' => 'required'
         ]);
         if ($validated) {
-            $this->message = "validation fail";
-            $this->code    = 422;
+            $this->message = 'validation fail';
+            $this->code = 422;
             return $this->responseData($validated);
         }
-        $data       = [];
-        $token      = $this->request->get('token');
+        $data = [];
+        $token = $this->request->get('token');
         $dataDecode = $this->jwtService->verifyJwtToken($token);
-        $userID     = ((array)$dataDecode['user'])['user_id'];
+        $userID = ((array)$dataDecode['user'])['user_id'];
         if (!isset($userID)) {
-            $this->message = "user id not found";
-            $this->code    = 404;
+            $this->message = 'user id not found';
+            $this->code = 404;
             goto next;
         }
         $user = $this->userRepo->firstByID($userID);
         if (!$user) {
-            $this->message = "user not found";
-            $this->code    = 404;
+            $this->message = 'user not found';
+            $this->code = 404;
             goto next;
         }
-        $this->status  = 'success';
-        $this->message = "user submitted successfully";
-        $data          = $userID;
+        $this->status = 'success';
+        $this->message = 'user submitted successfully';
+        $data = $userID;
         next:
         return \view('change-password')->with(['user_id' => $data]);
     }
@@ -210,33 +215,33 @@ class UserController extends Controller
     public function updateUserByParams()
     {
         $validated = $this->validateBase($this->request, [
-            'user_id'     => 'required',
+            'user_id' => 'required',
             'data_update' => 'required|array'
         ]);
         if ($validated) {
-            $this->message = "validation fail";
-            $this->code    = 422;
+            $this->message = 'validation fail';
+            $this->code = 422;
             return $this->responseData($validated);
         }
-        $data       = [];
-        $userID     = $this->request->get('user_id');
+        $data = [];
+        $userID = $this->request->get('user_id');
         $dataUpdate = $this->request->get('data_update');
 
         $user = $this->userRepo->firstByID($userID);
         if (!$user) {
-            $this->message = "user not found";
-            $this->code    = 404;
+            $this->message = 'user not found';
+            $this->code = 404;
             goto next;
         }
         $result = $this->userUsecase->updateUserByParams($user[User::_ID], $dataUpdate);
         if (!$result) {
-            $this->message = "user update failed";
-            $this->code    = 500;
+            $this->message = 'user update failed';
+            $this->code = 500;
             goto next;
         }
-        $this->status  = "success";
-        $this->message = "user updated successfully";
-        $data          = $result;
+        $this->status = 'success';
+        $this->message = 'user updated successfully';
+        $data = $result;
         next:
         return $this->responseData($data);
     }
@@ -244,7 +249,7 @@ class UserController extends Controller
     public function confirmForgotPassword($user_id)
     {
         $this->request->validate([
-            'new-password'     => ['required', 'min:6'],
+            'new-password' => ['required', 'min:6'],
             'confirm-password' => ['required', 'same:new-password'],
         ]);
 
@@ -257,21 +262,82 @@ class UserController extends Controller
     }
 
     // user info
-    public function getUserInfo(){
-        $validated = $this->validateBase($this->request,[
+    public function getUserInfo()
+    {
+        $validated = $this->validateBase($this->request, [
             'user_id' => 'required'
         ]);
         if ($validated) {
-            $this->message = "validation fail";
-            $this->code    = 422;
+            $this->message = 'validation fail';
+            $this->code = 422;
             return $this->responseData($validated);
         }
         $userID = $this->request->get('user_id');
 
         $userInfo = $this->userUsecase->getUserInfo($userID);
 
-        $this->message = "get user info successfully";
-        $this->status = "success";
+        $this->message = 'get user info successfully';
+        $this->status = 'success';
         return $this->responseData($userInfo);
+    }
+
+    public function getUserDetail()
+    {
+        $validated = $this->validateBase($this->request, [
+            'id' => 'required|integer'
+        ]);
+
+        if ($validated) {
+            $this->message = 'validation fail';
+            $this->code = 422;
+            return $this->responseData($validated);
+        }
+
+        $userId = $this->request->get('id');
+        $userDetail = $this->userUsecase->getUserDetail($userId);
+
+        if (!$userDetail) {
+            $this->message = 'User not found';
+            $this->code = 404;
+            return $this->responseData();
+        }
+
+        $this->message = 'Get user detail successfully';
+        $this->status = 'success';
+        return $this->responseData(
+            $userDetail
+        );
+    }
+
+    public function updatePoster()
+    {
+        $validated = $this->validateBase($this->request, [
+            'user_id' => 'required|integer',
+            'url' => 'required|string',
+            'size' => 'required|integer',
+            'type' => 'required|string',
+            'name' => 'required|string',
+        ]);
+        if ($validated) {
+            $this->message = 'validation fail';
+            $this->code = 422;
+            return $this->responseData($validated);
+        }
+
+        $userID = $this->request->get('user_id');
+        $url = $this->request->get('url');
+        $size = $this->request->get('size');
+        $type = $this->request->get('type');
+        $name = $this->request->get('name');
+
+        list($checked, $msg, $poster) = $this->userService->updatePoster($userID, $url, $size, $type, $name);
+        if (!$checked) {
+            $this->message = $msg;
+            $this->code = 500;
+            return $this->responseData();
+        }
+        $this->status = 'success';
+        $this->message = 'poster updated successfully';
+        return $this->responseData($poster);
     }
 }
