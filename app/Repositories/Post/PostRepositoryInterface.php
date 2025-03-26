@@ -7,5 +7,5 @@ use App\Repositories\RepositoryInterface;
 interface PostRepositoryInterface extends RepositoryInterface
 {
 
-    public function getListByParams($params);
+    public function getListByParams($params,$select=["*"]);
 }

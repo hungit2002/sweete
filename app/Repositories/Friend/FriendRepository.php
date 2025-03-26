@@ -16,6 +16,6 @@ class FriendRepository extends BaseRepository implements FriendRepositoryInterfa
 
     public function getByUserID(mixed $userID)
     {
-        return $this->_model->where(Friend::_USER_ID,$userID)->whereNull(Friend::_DELETED_AT)->get();
+        return $this->_model->with(["friends.user"])->where(Friend::_USER_ID,$userID)->whereNull(Friend::_DELETED_AT)->get();
     }
 }

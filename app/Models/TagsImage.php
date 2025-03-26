@@ -10,7 +10,7 @@ class TagsImage extends Model
 {
     use Authenticatable, HasFactory;
 
-    const TABLE = 'tags_image';
+    const TABLE = 'tags_images';
     const _USER_ID = 'user_id';
     const _IMAGE_ID = 'image_id';
     const _CREATED_AT = 'created_at';
