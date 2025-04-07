@@ -38,35 +38,17 @@ class FriendController extends Controller
         $fullName = $this->request->get('full_name');
         $limit = $this->request->get('limit');
 
-        $friends = $this->friendRepository->getByUserID($userID)->toArray();
-        $friendIDs = array_column($friends, Friend::_FRIEND_ID);
-
-        $select = [
-            User::_ID,
-            User::_PHONE,
-            User::_EMAIL,
-            User::_FULLNAME,
-            User::_ADDRESS,
-            User::_EDUCATION_INFO,
-            User::_WORK_INFO,
-            User::_GENDER,
-            User::_RELATIONSHIP,
-            User::_DOB,
-            User::_AVATAR,
-            User::_POSTER
-        ];
-        $param = [
+        $params = [
+            'user_id' => $userID,
             'full_name' => $fullName,
-            'ids' => $friendIDs,
+            'limit' => $limit
         ];
-        if (isset($limit)) {
-            $param['limit'] = $limit;
-        }
-        $users = $this->userRepository->getListByParams($param, $select)->toArray();
+        $friends = $this->userRepository->getFriendByParams($params)->toArray();
+
         next:
         $this->status = "success";
         $this->message = "get friend by param success";
         $this->code = 200;
-        return $this->responseData($users);
+        return $this->responseData($friends['friends']);
     }
 }

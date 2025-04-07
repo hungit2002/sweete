@@ -20,6 +20,7 @@ class Image extends Model
     const _POST_ID = 'post_id';
     const _NEW_ID = 'new_id';
     const _REMARKABLE_ID = 'remarkable_id';
+    const _USER_ID = 'user_id'; 
     const _CREATED_AT = 'created_at';
     const _UPDATED_AT = 'updated_at';
     const _DELETED_AT = 'deleted_at';
@@ -40,6 +41,7 @@ class Image extends Model
         self::_POST_ID,
         self::_NEW_ID,
         self::_REMARKABLE_ID,
+        self::_USER_ID,
         self::_CREATED_AT,
         self::_UPDATED_AT,
         self::_DELETED_AT,

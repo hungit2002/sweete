@@ -3,6 +3,7 @@
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FriendController;
+use App\Http\Controllers\ImageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -40,5 +41,8 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('update-poster', [UserController::class, 'updatePoster']);
         // friend
         Route::get('get-friends-by-param',[FriendController::class, 'getFriendByParam']);
+
+        // images
+        Route::get('get-user-images/{userID}',[ImageController::class, 'getImageByUserID']);
     });
 });

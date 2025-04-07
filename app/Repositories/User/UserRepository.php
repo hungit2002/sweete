@@ -2,6 +2,7 @@
 
 namespace App\Repositories\User;
 
+use App\Models\Friend;
 use App\Models\User;
 use App\Repositories\BaseRepository;
 
@@ -91,5 +92,21 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
             $query = $query->whereIn(User::_ID, $param['ids']);
         }
         return $query;
+    }
+
+    public function getFriendByParams($params)
+    {
+        $query = $this->_model->with(["friends" => function ($query) use ($params) {
+            if (isset($params['full_name'])) {
+                $query->where(User::_FULLNAME, 'like', '%' . $params['full_name'] . '%');
+            }
+            if (isset($params['limit'])) {
+                $query->limit($params['limit']);
+            }
+        }])->whereNull(Friend::_DELETED_AT);
+        if (isset($params['user_id'])) {
+            $query = $query->where(User::_ID, $params['user_id']);
+        }
+        return $query->first();
     }
 }

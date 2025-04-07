@@ -20,4 +20,6 @@ interface UserRepositoryInterface extends RepositoryInterface
     public function getByID(mixed $userID,$select);
 
     public function getUserInfoByUserIDs($friendIDs, array $select);
+
+    public function getFriendByParams($params);
 }
