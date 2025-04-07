@@ -27,7 +27,6 @@ class PostController extends Controller
     {
         $validated = $this->validateBase($this->request, [
             'user_id'    => 'integer|required',
-            'content'    => 'required',
             'images'     => 'array',
             'friends'    => 'array',
             'feeling'    => 'int',
@@ -42,7 +41,7 @@ class PostController extends Controller
         }
         $data = [];
         $userID        = $this->request->get('user_id');
-        $content       = $this->request->get('content');
+        $content       = $this->request->get('content') ?? "";
         $images        = $this->request->get('images');
         $friends       = $this->request->get('friends');
         $feeling       = $this->request->get('feeling');

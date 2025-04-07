@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Repositories\Images;
-
-interface ImageRepositoryInterface
+use App\Repositories\RepositoryInterface;
+interface ImageRepositoryInterface extends RepositoryInterface
 {
-
+    public function getImagesByUserID($userID, $perPage);
 }

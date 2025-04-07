@@ -12,4 +12,9 @@ class ImageRepository extends BaseRepository implements ImageRepositoryInterface
     {
         return Image::class;
     }
+
+    public function getImagesByUserID($userID, $perPage)
+    {
+        return $this->_model->where(Image::_USER_ID,$userID)->whereNull(Image::_DELETED_AT)->paginate($perPage);
+    }
 }

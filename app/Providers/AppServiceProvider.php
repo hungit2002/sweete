@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Repositories\Feel\FeelRepositoryInterface;
 use App\Repositories\Feel\FeelRepository;
+use App\Repositories\Feel\FeelRepositoryInterface;
 use App\Repositories\Friend\FriendRepository;
 use App\Repositories\Friend\FriendRepositoryInterface;
 use App\Repositories\Images\ImageRepository;
@@ -18,6 +18,8 @@ use App\Repositories\User\UserRepository;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Services\Email\MailService;
 use App\Services\Email\MailServiceInterface;
+use App\Services\Image\ImageService;
+use App\Services\Image\ImageServiceInterface;
 use App\Services\Jwt\JwtService;
 use App\Services\Jwt\JwtServiceInterface;
 use App\Services\User\IUserServiceInterface;
@@ -91,6 +93,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(
             TagImageRepositoryInterface::class,
             TagImageRepository::class
+        );
+        $this->app->singleton(
+            ImageServiceInterface::class,
+            ImageService::class
         );
     }
 

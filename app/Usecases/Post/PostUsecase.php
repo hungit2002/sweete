@@ -60,9 +60,8 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
             $tags = $this->prepareDataTagsInsert($post->id, $friends);
             $this->tagsRepo->insert($tags);
 
-            $results = $this->createImages($post->id, $images);
+            $results = $this->createImages($post->id, $post->user_id, $images);
             $gifs = $this->imageRepo->insert($this->prepareDataInsertGifs($post->id, $gifs));
-
             if ($status['type'] === Post::STATUS_FRIEND_SPECIFIC) {
                 $this->postRepo->update($post->id, [
                     Post::_FRIENDS_VIEW => json_encode(array_column($status['friends_specific'], 'id'))
@@ -146,7 +145,7 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
         return [$posts, $friends];
     }
 
-    private function createImages($postID, $images)
+    private function createImages($postID, $userID, $images)
     {
         $results = [];
         foreach ($images as $image) {
@@ -157,8 +156,9 @@ class PostUsecase extends BaseUsecase implements PostUsecaseInterface
                 Image::_TYPE => $image['type'],
                 Image::_NOTE => $image['note'],
                 Image::_POST_ID => $postID,
+                Image::_USER_ID => $userID,
                 Image::_CREATED_AT => date('Y-m-d H:i:s'),
-                Image::_UPDATED_AT => date('Y-m-d H:i:s')
+                Image::_UPDATED_AT => date('Y-m-d H:i:s'),
             ];
             $imageResult = $this->imageRepo->create($newImage);
             if ($image && $image['friends']) {
